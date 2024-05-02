@@ -1,4 +1,4 @@
-const { assert } = require("console");
+const { assert } = require("chai");
 
 const RWD = artifacts.require("RWD");
 const Tether = artifacts.require("Tether");
@@ -9,7 +9,7 @@ require("chai")
   .should();
 
 contract("DecentralBank", (accounts) => {
-  let tether, rwd, decentralBank;
+  let tether, rwd, decentralBank, customer;
 
   function tokens(number) {
     return web3.utils.toWei(number, "ether");
@@ -20,6 +20,7 @@ contract("DecentralBank", (accounts) => {
     tether = await Tether.new();
     rwd = await RWD.new();
     decentralBank = await DecentralBank.new(rwd.address, tether.address);
+    customer = accounts[1];
 
     // transfer initial balance
     await rwd.transfer(decentralBank.address, tokens("1000000"));
@@ -38,4 +39,26 @@ contract("DecentralBank", (accounts) => {
       assert.equal(name, "Reward Token");
     });
   });
+
+  describe("Decentral Bank Deployment", async () => {
+    it("matches name successfully", async () => {
+      const name = await decentralBank.name();
+      assert.equal(name, "DecentralBank");
+    });
+
+    it("contract has tokens", async () => {
+      let balance = await rwd.balanceOf(decentralBank.address);
+      assert.equal(balance, tokens("1000000"));
+    });
+  });
+
+  describe("Yield Farming", async () => {
+    it("rewards tokens for staking", async () => {
+      let result = await tether.balanceOf(customer);
+      assert.equal(result.toString(), tokens('100'), "customer mock wallet balance correct before staking");
+
+      await tether.approve(decentralBank.address, tokens('100'), { from: customer });
+      await decentralBank.depositTokens(tokens('100'), { from: customer });
+    }); 
+  })
 });
