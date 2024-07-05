@@ -15,3 +15,4 @@ balance = await tether.balanceOf(accounts[1])
 convertBalance = web3.utils.fromWei(balance)
 web3.utils.toWei("15", "Ether")
 
+truffle exec scripts/issue-tokens.js
