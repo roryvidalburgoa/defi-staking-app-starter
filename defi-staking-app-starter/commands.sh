@@ -13,4 +13,5 @@ db.address
 accounts = await web3.eth.getAccounts();
 balance = await tether.balanceOf(accounts[1])
 convertBalance = web3.utils.fromWei(balance)
-web3.utils.toWei(15, "Ether")
+web3.utils.toWei("15", "Ether")
+
